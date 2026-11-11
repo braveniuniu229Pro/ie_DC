@@ -22,9 +22,27 @@
 1. RouterID：是一个逻辑的编号，和IP一样也是32位，作为一个路由器在一个OSPF进程内的唯一标识。所以可以手动配置，也可能选取最大的环回地址。 
 
 ## OSPF五种报文
-》OSPF报文采用ip封装，在报文的ip头部中，协议号89
+><OSPF报文采用ip封装，在报文的ip头部中，协议号89（所以ACL deny 89.224.0.0.5及6的时候会有问题）
+> OSPF报文的源地址是接口的ip地址
+> 目的地址是组播地址224.0.0.5 代表所有运行OSPF协议的设备
+> 224.0.0.6 代表链路上的DR/BDR
 1. **HELLo** ：发现和维护邻居关系
 2. **Database Description**： 交互链路状态数据库摘要
 3. **Link State Request**：请求特定的链路状态信息
 4. **Link State update**：发送详细的链路状态信息
 5. **Link State AcK**：确认LSA
+
+![课程ppt截图1-1](./image/1.1.png)
+任何情况下ospf邻居建立的条件：
+1. routerid不能冲突
+2. areaid一致
+3. auth type一致
+4. auth data一致
+5. option中的N，E比特位要一致
+6. hellotime和deadtime要一致
+> <span style="color:rgb(238, 129, 12);background:yellow"> 可用dis ospf error +接口来进行ospf的排错，错误会依次一个个展示出来，需要一个个去解决 
+
+## 邻居建立的完整过程
+1. **down**：没有收到任何邻居的hello报文
+2. **init**：收到了邻居的hello报文，但是自己的routerid没有在对方的邻居列表中
+3. **2-wa**y：收到了邻居的hello报文，并且自己的routerid在对方的邻居列表中
